@@ -11,7 +11,7 @@ app = FastAPI()
 # ------------------
 MONGO_URI = "mongodb+srv://aayushit6969:anshmishralovesaditrajdhvishrivastva@youtubeproj.gki5s.mongodb.net/"  # change if using Atlas
 client = AsyncIOMotorClient(MONGO_URI)
-db = client["test2"]  
+db = client["youtube"]  
 videos_collection = db["videos"]
 
 # ------------------
@@ -31,8 +31,8 @@ class Video(BaseModel):
 
 @app.get("/")
 async def home():
-    video_count = await videos_collection.count_documents({})
-    return {"message": f"Connected! Total videos: {video_count}"}
+    
+    return {"message": "Home Route is working in python server"}
     
 @app.put("/create-embedding/{video_id}")
 async def create_embedding(video_id: str):
