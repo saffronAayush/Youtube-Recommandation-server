@@ -16,6 +16,11 @@ def get_video_embedding(video):
     # Convert numpy array to Python list (for MongoDB storage)
     return embedding.tolist()
 
+def get_search_embedding(search_text):
+    text = search_text
+    embedding = model.encode(text)
+    return embedding.tolist()
+
 
 def get_similar_videos(video, all_videos):
 
@@ -37,3 +42,25 @@ def get_similar_videos(video, all_videos):
     # Sort by similarity score (descending)
     similarities.sort(key=lambda x: x["score"], reverse=True)
     return similarities
+
+
+def get_similar_videos_from_embedding(embedding, all_videos):
+
+    # Convert target embedding to numpy
+    target_emb = np.array(embedding).reshape(1, -1)
+
+    similarities = []
+
+    for v in all_videos:
+        if not v.get("embedding"):  # skip if no embedding
+            continue
+
+        emb = np.array(v["embedding"]).reshape(1, -1)
+        sim = cosine_similarity(target_emb, emb).item()
+        if sim>=0:
+            similarities.append({"videoId": str(v["_id"]), "score": sim})
+
+    # Sort by similarity score (descending)
+    similarities.sort(key=lambda x: x["score"], reverse=True)
+    return similarities
+

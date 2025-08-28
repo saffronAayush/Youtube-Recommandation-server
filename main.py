@@ -1,8 +1,8 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
-from YoutubeRecommendation import get_video_embedding , get_similar_videos
+from YoutubeRecommendation import get_video_embedding , get_similar_videos , get_search_embedding , get_similar_videos_from_embedding
 
 app = FastAPI()
 # uvicorn main:app --reload 
@@ -118,12 +118,19 @@ async def update_matrix(video_id:str):
     print("done similarity")
     return {"success":True}
 
+@app.get("/get-search-results")
+async def get_search_results(search_text: str = Query(..., min_length=1)):
+    if(len(search_text.strip()) <= 0): 
+        raise HTTPException(status_code=400,detail="Search string cannot be empty")
+    embedding = get_search_embedding(search_text=search_text)
 
+    all_videos_cursor = videos_collection.find(
+        {}, {"_id": 1, "embedding": 1, "similarVideos": 1}
+    )
+    all_videos = await all_videos_cursor.to_list(length=None)
 
+    sim = get_similar_videos_from_embedding(embedding=embedding,all_videos=all_videos)
 
-
-
-
-
+    return {"success":True, "similarVideo":sim}
 
 
