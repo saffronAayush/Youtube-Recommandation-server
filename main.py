@@ -5,7 +5,7 @@ from bson import ObjectId
 from YoutubeRecommendation import get_video_embedding , get_similar_videos
 
 app = FastAPI()
-
+# uvicorn main:app --reload 
 # ------------------
 # MongoDB Connection
 # ------------------
